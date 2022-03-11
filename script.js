@@ -26,7 +26,7 @@ class Grid {
     }
 
     contain (x, y) {
-        return x < this.w && x > 0 && y < this.h && this.h > 0;
+        return (x < this.w && x >= 0) && (y < this.h && y >= 0);
     }
 
     putSnake (snake) {
@@ -45,6 +45,45 @@ class Grid {
 }
 
 const webGrid = document.querySelector(".grid")
+
+class Snake {
+
+    constructor(x, y) {
+        //Initial direction
+        this.direction = {x: 1, y:0};
+
+        //List of positions (x, y)
+        this.body = [{x, y}, {x, y}, {x, y}]
+    }
+
+    move() {
+        let head = this.body[0];
+        const {x, y} = this.direction;
+
+        //moving rest of the body
+        this.body.unshift({
+            x: head.x + x, 
+            y: head.y + y,
+        })
+
+        this.body.pop();
+            
+        return this.body;
+    }
+
+    changeDirection(d) {
+        const directions = {
+            "n": {x: 0, y: -1},
+            "s": {x: 0, y: 1},
+            "e": {x: 1, y: 0},
+            "o": {x: -1, y: 0},
+        }
+
+        this.direction = directions[d] || this.direction;
+    }
+
+    // grow()
+}
 
 function displayGrid(grid) {
     webGrid.innerHTML = "";
@@ -71,44 +110,35 @@ function displayGrid(grid) {
     
 }
 
-class Snake {
-    constructor(x, y) {
-        //Initial direction
-        this.direction = {x: 1, y:0};
-
-        //List of positions (x, y)
-        this.body = [{x, y}, {x, y}, {x, y}]
-    }
-
-    move() {
-        let head = this.body[0];
-        const {x, y} = this.direction;
-
-        //moving rest of the body
-        this.body.unshift({
-            x: head.x + x, 
-            y: head.y + y,
-        })
-
-        this.body.pop();
-            
-        return this.body;
-    }
-
-    // changeDirection()
-
-    // grow()
-}
-
 const grid = new Grid (11,11);
 const snake = new Snake(1,1);
 grid.clear();
 displayGrid(grid.getGrid())
 
 setInterval(() => {
-    grid.clear();
     const snakeBody = snake.move()
     grid.putSnake(snakeBody);
-    
+
     displayGrid(grid.getGrid());
-}, 3000)
+}, 500)
+
+document.addEventListener("keydown", (e) => {
+    const {key} = e;
+    console.log(key);
+    const inputs =  {
+        ArrowUp () {
+            snake.changeDirection("n")
+        },
+        ArrowDown() {
+            snake.changeDirection("s")
+        },
+        ArrowLeft() {
+            snake.changeDirection("o")
+        },
+        ArrowRight() {
+            snake.changeDirection("e")
+        },
+    }
+    
+    if (inputs[key]) inputs[key]()
+})
