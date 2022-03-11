@@ -1,8 +1,8 @@
 //create grid
 const grid = [
-    [0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,1,1,0,0,0,0,0,0,0],
+    [0,0,0,1,1,0,0,0,0,0,0],
+    [0,0,0,0,1,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0],
@@ -15,7 +15,7 @@ const grid = [
 
 const webGrid = document.querySelector(".grid")
 
-function createGrid(grid) {
+function displayGrid(grid) {
 
     for (let row of grid) {
         //create row
@@ -25,7 +25,11 @@ function createGrid(grid) {
         for (let coll of row) { 
             //create cell
             const cell = document.createElement("div");
+
             cell.classList.add("cell");
+
+            //redering snake
+            if (coll) cell.classList.add("snake");
 
             rowEl.appendChild(cell);
         }
@@ -35,4 +39,4 @@ function createGrid(grid) {
     
 }
 
-createGrid(grid);
+displayGrid(grid);
