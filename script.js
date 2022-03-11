@@ -1,21 +1,53 @@
 //create grid
-const grid = [
-    [0,0,1,1,0,0,0,0,0,0,0],
-    [0,0,0,1,1,0,0,0,0,0,0],
-    [0,0,0,0,1,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0],
-]
+
+class Grid {
+
+    constructor (w, h) {
+       this.w = w;
+       this.h = h; 
+
+       //creating intial matrix
+       this.grid = [];
+    }
+
+    getGrid () {
+        return this.grid;
+    }
+
+    clear () {
+        const h = this.h;
+        const w = this.w;
+
+        this.grid = [];
+        for (let i = 0; i < h; i++) {
+            let line = Array(w).fill(0);
+            this.grid.push(line);
+        }
+    }
+
+    contain (x, y) {
+        return x < this.w && x > 0 && y < this.h && this.h > 0;
+    }
+
+    putSnake (snake) {
+        //remove older skane
+        this.clear();
+
+        for (let bodyPiece of snake) {
+            const {x, y} = bodyPiece;
+
+            if (this.contain(x, y)) this.grid[y][x] = 1; 
+        }
+
+        return this.grid;
+    }
+
+}
 
 const webGrid = document.querySelector(".grid")
 
 function displayGrid(grid) {
+    webGrid.innerHTML = "";
 
     for (let row of grid) {
         //create row
@@ -39,28 +71,27 @@ function displayGrid(grid) {
     
 }
 
-displayGrid(grid);
-
 class Snake {
     constructor(x, y) {
         //Initial direction
         this.direction = {x: 1, y:0};
 
         //List of positions (x, y)
-        this.body = [{x, y}]
+        this.body = [{x, y}, {x, y}, {x, y}]
     }
 
     move() {
         let head = this.body[0];
         const {x, y} = this.direction;
 
-        head.x += x;
-        head.y += y;
-
         //moving rest of the body
-        this.body = this.body
-            .map((el, i, arr) => arr[i-1] || el);
+        this.body.unshift({
+            x: head.x + x, 
+            y: head.y + y,
+        })
 
+        this.body.pop();
+            
         return this.body;
     }
 
@@ -69,7 +100,15 @@ class Snake {
     // grow()
 }
 
-const snake = new Snake(0,0);
+const grid = new Grid (11,11);
+const snake = new Snake(1,1);
+grid.clear();
+displayGrid(grid.getGrid())
+
 setInterval(() => {
-    console.table(snake.move());
+    grid.clear();
+    const snakeBody = snake.move()
+    grid.putSnake(snakeBody);
+    
+    displayGrid(grid.getGrid());
 }, 3000)
