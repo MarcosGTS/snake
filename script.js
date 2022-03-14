@@ -49,16 +49,26 @@ const webGrid = document.querySelector(".grid")
 class Snake {
 
     constructor(x, y) {
+        
+        this.directions = {
+            "n": {x: 0, y: -1},
+            "s": {x: 0, y: 1},
+            "e": {x: 1, y: 0},
+            "o": {x: -1, y: 0},
+        }
+
         //Initial direction
-        this.direction = {x: 1, y:0};
+        this.currentDir = "e";
 
         //List of positions (x, y)
         this.body = [{x, y}, {x, y}, {x, y}]
     }
 
     move() {
-        let head = this.body[0];
-        const {x, y} = this.direction;
+        const head = this.body[0];
+        const { currentDir } = this
+        const { directions } = this
+        const { x, y } = directions[currentDir];
 
         //moving rest of the body
         this.body.unshift({
@@ -72,14 +82,14 @@ class Snake {
     }
 
     changeDirection(d) {
-        const directions = {
-            "n": {x: 0, y: -1},
-            "s": {x: 0, y: 1},
-            "e": {x: 1, y: 0},
-            "o": {x: -1, y: 0},
-        }
+        const { currentDir } = this
 
-        this.direction = directions[d] || this.direction;
+        if ( currentDir == "s" && d == "n") return;
+        if ( currentDir == "n" && d == "s") return;
+        if ( currentDir == "e" && d == "o") return;
+        if ( currentDir == "o" && d == "e") return;
+
+        this.currentDir = d || currentDir;
     }
 
     // grow()
@@ -124,7 +134,7 @@ setInterval(() => {
 
 document.addEventListener("keydown", (e) => {
     const {key} = e;
-    console.log(key);
+
     const inputs =  {
         ArrowUp () {
             snake.changeDirection("n")
