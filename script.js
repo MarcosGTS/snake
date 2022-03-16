@@ -19,10 +19,12 @@ class Grid {
         const w = this.w;
 
         this.grid = [];
+        
         for (let i = 0; i < h; i++) {
             let line = Array(w).fill(0);
             this.grid.push(line);
         }
+
     }
 
     contain (x, y) {
@@ -30,8 +32,6 @@ class Grid {
     }
 
     putSnake (snake) {
-        //remove older skane
-        this.clear();
 
         for (let bodyPiece of snake) {
             const {x, y} = bodyPiece;
@@ -43,8 +43,6 @@ class Grid {
     }
 
 }
-
-const webGrid = document.querySelector(".grid")
 
 class Snake {
 
@@ -61,22 +59,26 @@ class Snake {
         this.currentDir = "e";
 
         //List of positions (x, y)
-        this.body = [{x, y}, {x, y}, {x, y}]
+        this.body = [{x, y}, {x, y}, {x, y}, {x, y}, {x, y}]
+    }
+
+    getHead() {
+        return this.body[0];
     }
 
     move() {
-        const head = this.body[0];
-        const { currentDir } = this
-        const { directions } = this
+        const { body } = this
+        const { currentDir, directions } = this
         const { x, y } = directions[currentDir];
+        const head = body[0];
 
         //moving rest of the body
-        this.body.unshift({
+        body.unshift({
             x: head.x + x, 
             y: head.y + y,
         })
 
-        this.body.pop();
+        body.pop();
             
         return this.body;
     }
@@ -84,15 +86,27 @@ class Snake {
     changeDirection(d) {
         const { currentDir } = this
 
-        if ( currentDir == "s" && d == "n") return;
-        if ( currentDir == "n" && d == "s") return;
-        if ( currentDir == "e" && d == "o") return;
-        if ( currentDir == "o" && d == "e") return;
+        //moviment restrictions
+        if ( currentDir == "s" && d == "n" ) return;
+        if ( currentDir == "n" && d == "s" ) return;
+        if ( currentDir == "e" && d == "o" ) return;
+        if ( currentDir == "o" && d == "e" ) return;
 
         this.currentDir = d || currentDir;
     }
 
-    // grow()
+    grow() {
+        const { body } = this;
+        body.push(body[0]);
+    }
+
+    isHiting() {
+        const { x, y } = this.getHead()
+        const headlessBody = this.body.slice(1)
+        const result = headlessBody.reduce((rem, el) => rem || (el.x == x && el.y == y), false)
+
+        return result;
+    }
 }
 
 function displayGrid(grid) {
@@ -120,35 +134,56 @@ function displayGrid(grid) {
     
 }
 
-const grid = new Grid (11,11);
-const snake = new Snake(1,1);
-grid.clear();
-displayGrid(grid.getGrid())
 
-setInterval(() => {
-    const snakeBody = snake.move()
-    grid.putSnake(snakeBody);
+const webGrid = document.querySelector(".grid")
 
-    displayGrid(grid.getGrid());
-}, 500)
+//add a button to start the game 
 
-document.addEventListener("keydown", (e) => {
-    const {key} = e;
+//add a button to restart the game (game over screen)
 
-    const inputs =  {
-        ArrowUp () {
-            snake.changeDirection("n")
-        },
-        ArrowDown() {
-            snake.changeDirection("s")
-        },
-        ArrowLeft() {
-            snake.changeDirection("o")
-        },
-        ArrowRight() {
-            snake.changeDirection("e")
-        },
-    }
+function startGame() {
+    const grid = new Grid (10,10);
+    const snake = new Snake(1,1);
+
+    setInputHandling(snake);
+
+    const game = setInterval(() => {
+        //eval frame
+        grid.clear();
+        grid.putSnake(snake.move());
     
-    if (inputs[key]) inputs[key]()
-})
+        //game over condition
+        const { x, y } = snake.getHead();
+
+        if (!grid.contain(x, y)) clearInterval(game);
+        if (snake.isHiting()) clearInterval(game);
+
+        displayGrid(grid.getGrid());
+    }, 500)
+
+}
+
+function setInputHandling (snake) {
+    document.addEventListener("keydown", (e) => {
+        const {key} = e;
+    
+        const inputs =  {
+            ArrowUp () {
+                snake.changeDirection("n")
+            },
+            ArrowDown() {
+                snake.changeDirection("s")
+            },
+            ArrowLeft() {
+                snake.changeDirection("o")
+            },
+            ArrowRight() {
+                snake.changeDirection("e")
+            },
+        }
+        
+        if (inputs[key]) inputs[key]()
+    })
+}
+
+startGame();
