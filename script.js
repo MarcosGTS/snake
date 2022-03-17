@@ -99,14 +99,22 @@ class Snake {
 
     grow() {
         const { body } = this;
-        body.push(body[0]);
+        body.push(body[1]);
     }
 
     isHiting() {
         const { x, y } = this.getHead();
-        const headlessBody = this.body.slice(1);
+        const headlessBody = this.body.slice(1)
         const result = headlessBody.reduce((rem, el) => rem || (el.x == x && el.y == y), false)
 
+        return result;
+    }
+
+    isColiding(pos) {
+        const { x, y } = pos;
+        const { body } = this;
+        const result = body.some((el) => el.x == x && el.y == y);
+        console.log(result)
         return result;
     }
 }
@@ -129,7 +137,7 @@ class Fruit {
     }
 
     getRandomNumber(max) {
-        return Math.floor(Math.random() * (max + 1));
+        return Math.floor(Math.random() * max);
     }   
 }
 
@@ -167,6 +175,7 @@ const webGrid = document.querySelector(".grid")
 function startGame() {
     const grid = new Grid (10,10);
     const snake = new Snake(1,1);
+    const fruit = new Fruit(6, 6)
 
     setInputHandling(snake);
 
@@ -174,10 +183,22 @@ function startGame() {
         //eval frame
         grid.clear();
         grid.putSnake(snake.move());
-        
-        //game over condition
+        grid.putSnake([fruit.pos]);
+       
         const headPos = snake.getHead();
+        
+        //Fruit logic
+        if (fruit.isColiding(headPos)) {
+            snake.grow();
+            
+            while (true) {
+                const fruitPos = fruit.changePostion(10, 10);
+                console.log("trying", fruitPos)
+                if (!snake.isColiding(fruitPos)) break;
+            }
+        }
 
+        //game over condition
         if (!grid.contain(headPos)) clearInterval(game);
         if (snake.isHiting()) clearInterval(game);
 
