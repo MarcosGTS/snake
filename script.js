@@ -3,11 +3,9 @@
 class Grid {
 
     constructor (w, h) {
-       this.w = w;
-       this.h = h; 
-
-       //creating intial matrix
-       this.grid = [];
+        this.w = w;
+        this.h = h; 
+        this.grid = [];
     }
 
     getGrid () {
@@ -24,24 +22,28 @@ class Grid {
             let line = Array(w).fill(0);
             this.grid.push(line);
         }
-
     }
 
-    contain (x, y) {
-        return (x < this.w && x >= 0) && (y < this.h && y >= 0);
+    contain (pos) {
+        const { w, h } = this;
+        const { x, y } = pos;
+        
+        return (x < w && x >= 0) && (y < h && y >= 0);
+    }
+
+    putPixel(pos, value) {
+        const { x, y } = pos;
+        if (this.contain(pos)) this.grid[y][x] = value;
     }
 
     putSnake (snake) {
 
         for (let bodyPiece of snake) {
-            const {x, y} = bodyPiece;
-
-            if (this.contain(x, y)) this.grid[y][x] = 1; 
+            this.putPixel(bodyPiece, 1);
         }
 
         return this.grid;
     }
-
 }
 
 class Snake {
@@ -101,12 +103,34 @@ class Snake {
     }
 
     isHiting() {
-        const { x, y } = this.getHead()
-        const headlessBody = this.body.slice(1)
+        const { x, y } = this.getHead();
+        const headlessBody = this.body.slice(1);
         const result = headlessBody.reduce((rem, el) => rem || (el.x == x && el.y == y), false)
 
         return result;
     }
+}
+
+class Fruit {
+    constructor(x, y) {
+        this.pos = {x, y}
+    }
+
+    isColiding(pos) {
+        const fruit = this.pos;
+        return fruit.x == pos.x && fruit.y == pos.y;
+    }
+
+    changePostion(w, h) {
+        const x = this.getRandomNumber(w);
+        const y = this.getRandomNumber(h);
+        this.pos = {x, y};
+        return {x, y};
+    }
+
+    getRandomNumber(max) {
+        return Math.floor(Math.random() * (max + 1));
+    }   
 }
 
 function displayGrid(grid) {
@@ -134,7 +158,6 @@ function displayGrid(grid) {
     
 }
 
-
 const webGrid = document.querySelector(".grid")
 
 //add a button to start the game 
@@ -151,21 +174,21 @@ function startGame() {
         //eval frame
         grid.clear();
         grid.putSnake(snake.move());
-    
+        
         //game over condition
-        const { x, y } = snake.getHead();
+        const headPos = snake.getHead();
 
-        if (!grid.contain(x, y)) clearInterval(game);
+        if (!grid.contain(headPos)) clearInterval(game);
         if (snake.isHiting()) clearInterval(game);
 
         displayGrid(grid.getGrid());
-    }, 500)
+    }, 250)
 
 }
 
 function setInputHandling (snake) {
     document.addEventListener("keydown", (e) => {
-        const {key} = e;
+        const { key } = e;
     
         const inputs =  {
             ArrowUp () {
