@@ -1,4 +1,5 @@
-//create grid
+const SNAKE_COLOR = "green";
+const APPLE_COLOR = "red";
 
 class Grid {
 
@@ -103,7 +104,8 @@ class Snake {
 
     grow() {
         const { body } = this;
-        body.push(body[1]);
+        const last = body.length - 1;
+        body.push(body[last]);
     }
 
     isHiting() {
@@ -118,7 +120,6 @@ class Snake {
         const { x, y } = pos;
         const { body } = this;
         const result = body.some((el) => el.x == x && el.y == y);
-        console.log(result)
         return result;
     }
 }
@@ -194,10 +195,12 @@ function startGame() {
 
     const game = setInterval(() => {
         //eval frame
+        
         grid.clear();
-        grid.putPixels(snake.move(), "green");
-        grid.putPixel(fruit.pos, "red");
-       
+        snake.move()
+
+        grid.putPixel(fruit.pos, APPLE_COLOR);
+        grid.putPixels(snake.body, SNAKE_COLOR);
         const headPos = snake.getHead();
         
         //Fruit logic
@@ -205,8 +208,8 @@ function startGame() {
             snake.grow();
             
             do {
-                const fruitPos = fruit.changePostion(10, 10);
-            } while(snake.isColiding(fruitPos))
+                fruit.changePostion(10, 10);
+            } while(snake.isColiding(fruit.pos))
         }
 
         //change direction
