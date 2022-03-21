@@ -10,6 +10,8 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    height: 100vh;
 }
 
 .grid, 
@@ -28,4 +30,44 @@ body {
 
 .snake {
     background-color: green;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    
+    width: 10rem;
+    height: 7.5rem;
+    border: 1px solid gray;
+    border-radius: 5px;
+    background-color: white; 
+}
+
+.hidden {
+    display: none;
+    cursor: none;
+}
+
+.menu button {
+    color: white;
+    background-color: rgb(71, 71, 240);
+
+    border: none;
+    border-radius: 5px;
+    font-size: 20px;
+    padding: 0.5rem 1rem;
+
+    transition: 150ms ease-in;
+}
+
+.menu button:active {
+    transform: scale(0.9);
+}
+
+.menu button:hover {
+    filter: brightness(0.9);
 }

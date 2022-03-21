@@ -216,8 +216,10 @@ function startGame() {
         translateInput(snake, currentKey);
 
         //game over condition
-        if (!grid.contain(headPos)) clearInterval(game);
-        if (snake.isHiting()) clearInterval(game);
+        if (!grid.contain(headPos) || snake.isHiting()) {
+            clearInterval(game);
+            displayMenu();
+        }
 
         displayGrid(grid.getGrid());
     }, 250)
@@ -232,6 +234,15 @@ document.addEventListener("keydown", (e) => {
 
 //add a button to start the game 
 
+const menu = document.querySelector(".menu");
+const startBtn = document.querySelector(".start");
 //add a button to restart the game (game over screen)
 
-startGame();
+startBtn.addEventListener("click", () => {
+    startGame()
+    menu.classList.toggle("hidden");
+})
+
+function displayMenu() {
+    menu.classList.toggle("hidden")
+}
