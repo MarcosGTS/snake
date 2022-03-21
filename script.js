@@ -36,10 +36,14 @@ class Grid {
         if (this.contain(pos)) this.grid[y][x] = value;
     }
 
-    putSnake (snake) {
+    putPixels (list, value) {
+        /* 
+            list -> a list of positions ({x, y})
+            value -> value of a primitive type
+        */
 
-        for (let bodyPiece of snake) {
-            this.putPixel(bodyPiece, 1);
+        for (let pos of list) {
+            this.putPixel(pos, value);
         }
 
         return this.grid;
@@ -149,66 +153,19 @@ function displayGrid(grid) {
         const rowEl = document.createElement("div");
         rowEl.classList.add("row")
 
-        for (let coll of row) { 
+        for (let value of row) { 
             //create cell
             const cell = document.createElement("div");
 
             cell.classList.add("cell");
-
-            //redering snake
-            if (coll) cell.classList.add("snake");
-
+            cell.style.backgroundColor = value;
+            
             rowEl.appendChild(cell);
         }
 
         webGrid.appendChild(rowEl);
     }
     
-}
-
-const webGrid = document.querySelector(".grid")
-let currentKey = "";
-document.addEventListener("keydown", (e) => {
-    currentKey = e.key;
-})
-
-//add a button to start the game 
-
-//add a button to restart the game (game over screen)
-
-function startGame() {
-    const grid = new Grid (10,10);
-    const snake = new Snake(1,1);
-    const fruit = new Fruit(6, 6)
-
-    const game = setInterval(() => {
-        //eval frame
-        grid.clear();
-        grid.putSnake(snake.move());
-        grid.putSnake([fruit.pos]);
-       
-        const headPos = snake.getHead();
-        
-        //Fruit logic
-        if (fruit.isColiding(headPos)) {
-            snake.grow();
-            
-            while (true) {
-                const fruitPos = fruit.changePostion(10, 10);
-                if (!snake.isColiding(fruitPos)) break;
-            }
-        }
-
-        //change direction
-        translateInput(snake, currentKey);
-
-        //game over condition
-        if (!grid.contain(headPos)) clearInterval(game);
-        if (snake.isHiting()) clearInterval(game);
-
-        displayGrid(grid.getGrid());
-    }, 250)
-
 }
 
 function translateInput(snake, key) {
@@ -230,7 +187,48 @@ function translateInput(snake, key) {
     if (inputs[key]) inputs[key]()
 }
 
+function startGame() {
+    const grid = new Grid (10,10);
+    const snake = new Snake(1,1);
+    const fruit = new Fruit(6, 6)
 
+    const game = setInterval(() => {
+        //eval frame
+        grid.clear();
+        grid.putPixels(snake.move(), "green");
+        grid.putPixel(fruit.pos, "red");
+       
+        const headPos = snake.getHead();
+        
+        //Fruit logic
+        if (fruit.isColiding(headPos)) {
+            snake.grow();
+            
+            do {
+                const fruitPos = fruit.changePostion(10, 10);
+            } while(snake.isColiding(fruitPos))
+        }
 
+        //change direction
+        translateInput(snake, currentKey);
+
+        //game over condition
+        if (!grid.contain(headPos)) clearInterval(game);
+        if (snake.isHiting()) clearInterval(game);
+
+        displayGrid(grid.getGrid());
+    }, 250)
+
+}
+
+const webGrid = document.querySelector(".grid")
+let currentKey = "";
+document.addEventListener("keydown", (e) => {
+    currentKey = e.key;
+})
+
+//add a button to start the game 
+
+//add a button to restart the game (game over screen)
 
 startGame();
