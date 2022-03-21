@@ -167,6 +167,10 @@ function displayGrid(grid) {
 }
 
 const webGrid = document.querySelector(".grid")
+let currentKey = "";
+document.addEventListener("keydown", (e) => {
+    currentKey = e.key;
+})
 
 //add a button to start the game 
 
@@ -176,8 +180,6 @@ function startGame() {
     const grid = new Grid (10,10);
     const snake = new Snake(1,1);
     const fruit = new Fruit(6, 6)
-
-    setInputHandling(snake);
 
     const game = setInterval(() => {
         //eval frame
@@ -193,10 +195,12 @@ function startGame() {
             
             while (true) {
                 const fruitPos = fruit.changePostion(10, 10);
-                console.log("trying", fruitPos)
                 if (!snake.isColiding(fruitPos)) break;
             }
         }
+
+        //change direction
+        translateInput(snake, currentKey);
 
         //game over condition
         if (!grid.contain(headPos)) clearInterval(game);
@@ -207,27 +211,26 @@ function startGame() {
 
 }
 
-function setInputHandling (snake) {
-    document.addEventListener("keydown", (e) => {
-        const { key } = e;
+function translateInput(snake, key) {
+    const inputs =  {
+        ArrowUp () {
+            snake.changeDirection("n")
+        },
+        ArrowDown() {
+            snake.changeDirection("s")
+        },
+        ArrowLeft() {
+            snake.changeDirection("o")
+        },
+        ArrowRight() {
+            snake.changeDirection("e")
+        },
+    }
     
-        const inputs =  {
-            ArrowUp () {
-                snake.changeDirection("n")
-            },
-            ArrowDown() {
-                snake.changeDirection("s")
-            },
-            ArrowLeft() {
-                snake.changeDirection("o")
-            },
-            ArrowRight() {
-                snake.changeDirection("e")
-            },
-        }
-        
-        if (inputs[key]) inputs[key]()
-    })
+    if (inputs[key]) inputs[key]()
 }
+
+
+
 
 startGame();
