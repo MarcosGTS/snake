@@ -1,6 +1,6 @@
 const grid_size = document.querySelector(".grid").clientWidth;
 
-const GRID_DIMENSION = 15;
+const GRID_DIMENSION = 6;
 const CELL_SIZE = `${grid_size / GRID_DIMENSION}px`;
 const SNAKE_COLOR = "green";
 const APPLE_COLOR = "red";
@@ -113,9 +113,9 @@ class Snake {
     }
 
     isHiting() {
-        const { x, y } = this.getHead();
+        const head = this.getHead();
         const headlessBody = this.body.slice(1)
-        const result = headlessBody.reduce((rem, el) => rem || (el.x == x && el.y == y), false)
+        const result = headlessBody.some(({ x, y }) => x == head.x && y == head.y);
 
         return result;
     }
@@ -124,6 +124,7 @@ class Snake {
         const { x, y } = pos;
         const { body } = this;
         const result = body.some((el) => el.x == x && el.y == y);
+        
         return result;
     }
 }
@@ -139,10 +140,20 @@ class Fruit {
     }
 
     changePostion(w, h, execptions=[]) {
-        const x = this.getRandomNumber(w);
-        const y = this.getRandomNumber(h);
-        this.pos = {x, y};
-        return {x, y};
+        const { pos } = this;
+        let isColinding = false;
+
+        do {
+            pos.x = this.getRandomNumber(w)
+            pos.y = this.getRandomNumber(h);
+
+            isColinding = execptions.some(({ x, y }) => {
+                return pos.x == x && pos.y == y;
+            })
+
+        } while (isColinding)
+        
+        return pos;
     }
 
     getRandomNumber(max) {
@@ -195,9 +206,11 @@ function translateInput(snake, key) {
 }
 
 function startGame() {
-    const grid = new Grid (GRID_DIMENSION,GRID_DIMENSION);
+    const grid = new Grid (GRID_DIMENSION, GRID_DIMENSION);
     const snake = new Snake(1,1);
-    const fruit = new Fruit(6, 6)
+    const fruit = new Fruit(0, 0);
+
+    currentKey = ""; 
 
     const game = setInterval(() => {
         //eval frame
@@ -212,10 +225,7 @@ function startGame() {
         //Fruit logic
         if (fruit.isColiding(headPos)) {
             snake.grow();
-            
-            do {
-                fruit.changePostion(10, 10);
-            } while(snake.isColiding(fruit.pos))
+            fruit.changePostion(GRID_DIMENSION, GRID_DIMENSION, snake.body);
         }
 
         //change direction
@@ -239,9 +249,9 @@ document.addEventListener("keydown", (e) => {
 })
 
 //add a button to start the game 
-
 const menu = document.querySelector(".menu");
 const startBtn = document.querySelector(".start");
+
 //add a button to restart the game (game over screen)
 
 startBtn.addEventListener("click", () => {
