@@ -1,3 +1,7 @@
+const grid_size = document.querySelector(".grid").clientWidth;
+
+const GRID_DIMENSION = 15;
+const CELL_SIZE = `${grid_size / GRID_DIMENSION}px`;
 const SNAKE_COLOR = "green";
 const APPLE_COLOR = "red";
 
@@ -134,7 +138,7 @@ class Fruit {
         return fruit.x == pos.x && fruit.y == pos.y;
     }
 
-    changePostion(w, h) {
+    changePostion(w, h, execptions=[]) {
         const x = this.getRandomNumber(w);
         const y = this.getRandomNumber(h);
         this.pos = {x, y};
@@ -160,6 +164,8 @@ function displayGrid(grid) {
 
             cell.classList.add("cell");
             cell.style.backgroundColor = value;
+            cell.style.width  = CELL_SIZE;
+            cell.style.height = CELL_SIZE;
             
             rowEl.appendChild(cell);
         }
@@ -189,7 +195,7 @@ function translateInput(snake, key) {
 }
 
 function startGame() {
-    const grid = new Grid (10,10);
+    const grid = new Grid (GRID_DIMENSION,GRID_DIMENSION);
     const snake = new Snake(1,1);
     const fruit = new Fruit(6, 6)
 
